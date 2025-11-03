@@ -1,0 +1,47 @@
+# Node modules
+frontend/node_modules/
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+env/
+
+# Database
+*.db
+sql_app.db
+
+# Models (large files)
+models/
+*.pt
+*.onnx
+yolov8n.pt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Misc
+1.21.6
