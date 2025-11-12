@@ -8,12 +8,13 @@ class TrainingService:
     def __init__(self, recognition_service: FaceRecognitionService):
         self.recognition_service = recognition_service
 
-    def generate_and_store_embedding(self, db: Session, student_name: str, image_data: np.ndarray):
+    def generate_and_store_embedding(self, db: Session, student_name: str, image_data: np.ndarray, 
+                                     roll_number: str = None, email: str = None, photo_path: str = None):
         embedding = self.recognition_service.get_face_embedding(image_data)
         if embedding is None:
             return None
 
-        # Check if student already exists
+        # Check if student already exists by name
         db_student = db.query(Student).filter(Student.name == student_name).first()
         
         if db_student:
@@ -27,11 +28,25 @@ class TrainingService:
                 db_student.set_embedding(averaged_embedding)
             else:
                 db_student.set_embedding(embedding)
+            
+            # Update other fields if provided
+            if roll_number:
+                db_student.roll_number = roll_number
+            if email:
+                db_student.email = email
+            if photo_path:
+                db_student.photo_path = photo_path
+                
             db.commit()
             db.refresh(db_student)
         else:
             # Create new student
-            db_student = Student(name=student_name)
+            db_student = Student(
+                name=student_name,
+                roll_number=roll_number,
+                email=email,
+                photo_path=photo_path
+            )
             db_student.set_embedding(embedding)
             db.add(db_student)
             db.commit()
@@ -44,13 +59,32 @@ class TrainingService:
         return [{
             "id": student.id,
             "name": student.name,
+            "roll_number": student.roll_number,
             "embedding": student.get_embedding()
         } for student in students if student.get_embedding() is not None]
+
+    def store_student_embedding(self, db: Session, student_name: str, embedding: np.ndarray,
+                                roll_number: str = None, email: str = None, photo_path: str = None):
+        """Store student with pre-computed embedding"""
+        db_student = Student(
+            name=student_name,
+            roll_number=roll_number,
+            email=email,
+            photo_path=photo_path
+        )
+        db_student.set_embedding(embedding)
+        db.add(db_student)
+        db.commit()
+        db.refresh(db_student)
+        return db_student
 
     def get_all_students_list(self, db: Session) -> List[dict]:
         """Get all students without embeddings for display purposes"""
         students = db.query(Student).all()
         return [{
             "id": student.id,
-            "name": student.name
+            "name": student.name,
+            "roll_number": student.roll_number,
+            "email": student.email,
+            "photo_path": student.photo_path
         } for student in students]

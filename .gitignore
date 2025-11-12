@@ -19,6 +19,10 @@ env/
 # Database
 *.db
 sql_app.db
+sql_app_backup_*.db
+
+# Student photos
+student_photos/
 
 # Models (large files)
 models/

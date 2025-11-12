@@ -16,6 +16,9 @@ class Student(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
+    roll_number = Column(String, unique=True, index=True)
+    email = Column(String)
+    photo_path = Column(String)
     embedding = Column(LargeBinary) # Store numpy array as bytes
 
     attendances = relationship("Attendance", back_populates="student")
@@ -32,6 +35,7 @@ class Attendance(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
     timestamp = Column(DateTime, default=datetime.utcnow)
+    camera_id = Column(String)
 
     student = relationship("Student", back_populates="attendances")
 

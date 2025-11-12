@@ -1,0 +1,296 @@
+/* Live Monitoring Page */
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 32px;
+  color: #2d3748;
+  margin: 0 0 10px 0;
+}
+
+.page-subtitle {
+  color: #718096;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Grid View Styles */
+.monitoring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.monitoring-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.monitoring-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.camera-preview {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: #1a202c;
+  overflow: hidden;
+}
+
+.camera-snapshot {
+  width: 100%;
+  height: 100%;
+}
+
+.camera-snapshot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.snapshot-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #cbd5e0;
+}
+
+.snapshot-placeholder p:first-child {
+  font-size: 48px;
+  margin: 0;
+}
+
+.snapshot-placeholder p:last-child {
+  font-size: 14px;
+  margin: 10px 0 0 0;
+}
+
+.camera-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+.live-badge {
+  background: #e53e3e;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.camera-info {
+  padding: 20px;
+}
+
+.camera-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  color: #2d3748;
+}
+
+.camera-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* Single Camera View */
+.single-camera-view {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.video-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.video-container {
+  position: relative;
+  background: #1a202c;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.camera-feed {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.video-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  color: #cbd5e0;
+}
+
+.video-placeholder p:first-child {
+  font-size: 72px;
+  margin: 0;
+}
+
+.video-placeholder p:last-child {
+  font-size: 18px;
+  margin: 20px 0 0 0;
+}
+
+.recognition-overlay {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-lg {
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.faces-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.face-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.face-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.face-info {
+  flex: 1;
+}
+
+.face-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #2d3748;
+}
+
+.face-info p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #718096;
+}
+
+.confidence-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #48bb78, #38a169);
+  transition: width 0.3s;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #718096;
+}
+
+.no-data {
+  text-align: center;
+  color: #a0aec0;
+  padding: 30px;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .single-camera-view {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .monitoring-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  
+  .btn-lg {
+    padding: 12px 30px;
+    font-size: 16px;
+  }
+}

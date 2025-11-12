@@ -3,29 +3,44 @@ import insightface
 from insightface.app import FaceAnalysis
 from typing import List, Dict, Any
 from scipy.spatial.distance import cosine
-import cv2 # Added for image preprocessing
+import cv2
+from backend.app.config import config
 
 class FaceRecognitionService:
     def __init__(self):
-        # Initialize FaceAnalysis with the antelopev2 model pack, which includes both detector and recognizer.
-        # This satisfies the internal 'detection' model assertion in InsightFace.
-        # We will still use YOLOv8n-face for actual detection in our pipeline.
-        # Try GPU first, fallback to CPU if GPU not available
-        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        # Load configuration
+        fr_config = config.get_section('face_recognition')
+        det_config = fr_config.get('detection', {})
+        rec_config = fr_config.get('recognition', {})
+        
+        # Initialize FaceAnalysis with configured model
+        providers = fr_config.get('providers', ['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        model_name = fr_config.get('model_name', 'buffalo_l')
+        model_path = fr_config.get('model_path', './models')
         
         self.app = FaceAnalysis(
-            name='buffalo_l', 
-            root='./models', 
+            name=model_name, 
+            root=model_path, 
             providers=providers
         )
-        # GPU can handle larger det_size, use 320x320 for better accuracy at high speed
+        
+        # Try GPU configuration first, fallback to CPU
+        det_size_gpu = tuple(det_config.get('det_size_gpu', [320, 320]))
+        det_size_cpu = tuple(det_config.get('det_size_cpu', [192, 192]))
+        det_thresh_gpu = det_config.get('det_threshold_gpu', 0.5)
+        det_thresh_cpu = det_config.get('det_threshold_cpu', 0.6)
+        
         try:
-            self.app.prepare(ctx_id=0, det_size=(320, 320), det_thresh=0.5)
-            print(f"✓ Face Recognition initialized with GPU acceleration")
+            self.app.prepare(ctx_id=0, det_size=det_size_gpu, det_thresh=det_thresh_gpu)
+            print(f"✓ Face Recognition initialized with GPU (SCRFD-10G detector)")
+            print(f"  Model: {model_name}, Detection size: {det_size_gpu}, Threshold: {det_thresh_gpu}")
         except:
-            # Fallback to smaller size if GPU memory limited
-            self.app.prepare(ctx_id=0, det_size=(192, 192), det_thresh=0.6)
-            print(f"✓ Face Recognition initialized (CPU mode)")
+            self.app.prepare(ctx_id=0, det_size=det_size_cpu, det_thresh=det_thresh_cpu)
+            print(f"✓ Face Recognition initialized with CPU (SCRFD-10G detector)")
+            print(f"  Model: {model_name}, Detection size: {det_size_cpu}, Threshold: {det_thresh_cpu}")
+        
+        # Store threshold for matching
+        self.similarity_threshold = rec_config.get('similarity_threshold', 0.6)
 
     def get_face_embedding(self, face_image: np.ndarray) -> np.ndarray:
         """
@@ -47,16 +62,23 @@ class FaceRecognitionService:
         
         return embedding
 
-    def compare_embeddings(self, embedding1: np.ndarray, embedding2: np.ndarray, threshold: float = 0.6) -> bool:
+    def compare_embeddings(self, embedding1: np.ndarray, embedding2: np.ndarray, threshold: float = None) -> bool:
         if embedding1 is None or embedding2 is None:
             return False
+        # Use configured threshold if not provided
+        if threshold is None:
+            threshold = self.similarity_threshold
         # Cosine distance is 1 - cosine similarity. Lower distance means higher similarity.
         distance = cosine(embedding1, embedding2)
         return distance < threshold
 
-    def find_match(self, new_embedding: np.ndarray, registered_students: List[Dict[str, Any]], threshold: float = 0.6) -> (str, float):
+    def find_match(self, new_embedding: np.ndarray, registered_students: List[Dict[str, Any]], threshold: float = None) -> (str, float):
         if new_embedding is None:
             return "Unknown", 0.0
+        
+        # Use configured threshold if not provided
+        if threshold is None:
+            threshold = self.similarity_threshold
 
         min_distance = float('inf')
         matched_student_name = "Unknown"

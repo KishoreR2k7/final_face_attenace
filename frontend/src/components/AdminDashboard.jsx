@@ -1,90 +1,175 @@
-import React, { useState } from 'react';
-import AddStudentForm from './AddStudentForm';
-import AddCameraForm from './AddCameraForm';
-import LiveRecognition from './LiveRecognition';
-import AttendanceRecords from './AttendanceRecords';
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import StudentsManagement from './StudentsManagement'
+import CamerasManagement from './CamerasManagement'
+import LiveMonitoring from './LiveMonitoring'
+import AttendanceManagement from './AttendanceManagement'
+import './AdminDashboard.css'
 
-function AdminDashboard({ onLogout }) {
-  const [activeTab, setActiveTab] = useState('students');
+function AdminDashboard() {
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [stats, setStats] = useState({
+    total_students: 0,
+    active_cameras: 0,
+    present_today: 0,
+    attendance_rate: 0
+  })
+
+  useEffect(() => {
+    // Fetch dashboard stats
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    // TODO: Implement API call to fetch stats
+    // For now using mock data
+    setStats({
+      total_students: 45,
+      active_cameras: 3,
+      present_today: 38,
+      attendance_rate: 84.4
+    })
+  }
+
+  const handleLogout = () => {
+    navigate('/')
+  }
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return renderDashboard()
       case 'students':
-        return <AddStudentForm />;
+        return <StudentsManagement />
       case 'cameras':
-        return <AddCameraForm />;
-      case 'live-recognition':
-        return <LiveRecognition />;
+        return <CamerasManagement />
+      case 'live':
+        return <LiveMonitoring />
       case 'attendance':
-        return <AttendanceRecords />;
+        return <AttendanceManagement />
       default:
-        return <AddStudentForm />;
+        return renderDashboard()
     }
-  };
+  }
 
-  return (
-    <div className="mt-8 bg-white shadow-lg sm:rounded-lg w-full max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Admin Dashboard</h2>
-      
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={onLogout}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          Logout
-        </button>
+  const renderDashboard = () => (
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">Dashboard Overview</h1>
+        <p className="page-subtitle">Monitor attendance and system statistics</p>
       </div>
 
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      {/* Stats Cards */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon">👥</div>
+          <div className="stat-value">{stats.total_students}</div>
+          <div className="stat-label">Total Students</div>
+        </div>
+        <div className="stat-card stat-success">
+          <div className="stat-icon">✓</div>
+          <div className="stat-value">{stats.present_today}</div>
+          <div className="stat-label">Present Today</div>
+        </div>
+        <div className="stat-card stat-info">
+          <div className="stat-icon">📹</div>
+          <div className="stat-value">{stats.active_cameras}</div>
+          <div className="stat-label">Active Cameras</div>
+        </div>
+        <div className="stat-card stat-primary">
+          <div className="stat-icon">📊</div>
+          <div className="stat-value">{stats.attendance_rate}%</div>
+          <div className="stat-label">Attendance Rate</div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="card">
+        <h2>Quick Actions</h2>
+        <div className="action-buttons">
           <button
+            className="btn btn-primary"
             onClick={() => setActiveTab('students')}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'students'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
           >
-            Students
+            👥 Manage Students
           </button>
           <button
+            className="btn btn-success"
             onClick={() => setActiveTab('cameras')}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'cameras'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
           >
-            Cameras
+            📹 Manage Cameras
           </button>
           <button
-            onClick={() => setActiveTab('live-recognition')}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'live-recognition'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+            className="btn btn-info"
+            onClick={() => setActiveTab('live')}
           >
-            Live Recognition
+            📡 Live Recognition
           </button>
           <button
+            className="btn btn-secondary"
             onClick={() => setActiveTab('attendance')}
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'attendance'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
           >
-            Attendance
+            📝 View Attendance
           </button>
-        </nav>
-      </div>
-
-      <div className="mt-6">
-        {renderContent()}
+        </div>
       </div>
     </div>
-  );
+  )
+
+  return (
+    <div className="admin-dashboard">
+      <nav className="navbar">
+        <div className="navbar-content">
+          <div className="navbar-brand">🎓 Admin Portal</div>
+          <button onClick={handleLogout} className="btn btn-secondary">
+            Logout
+          </button>
+        </div>
+      </nav>
+
+      <div className="admin-container">
+        <div className="sidebar">
+          <div className="sidebar-menu">
+            <button
+              className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              🏠 Dashboard
+            </button>
+            <button
+              className={`sidebar-item ${activeTab === 'students' ? 'active' : ''}`}
+              onClick={() => setActiveTab('students')}
+            >
+              👥 Students
+            </button>
+            <button
+              className={`sidebar-item ${activeTab === 'cameras' ? 'active' : ''}`}
+              onClick={() => setActiveTab('cameras')}
+            >
+              📹 Cameras
+            </button>
+            <button
+              className={`sidebar-item ${activeTab === 'live' ? 'active' : ''}`}
+              onClick={() => setActiveTab('live')}
+            >
+              📡 Live Recognition
+            </button>
+            <button
+              className={`sidebar-item ${activeTab === 'attendance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('attendance')}
+            >
+              📝 Attendance
+            </button>
+          </div>
+        </div>
+
+        <div className="main-content">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  )
 }
 
-export default AdminDashboard;
+export default AdminDashboard

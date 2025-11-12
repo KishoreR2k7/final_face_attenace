@@ -1,96 +1,99 @@
 import React, { useState } from 'react'
-import Login from '../components/Login'
-import AdminDashboard from '../components/AdminDashboard'
-import StudentDashboard from '../components/StudentDashboard'
-import { loginAdmin } from '../api'
-
-const ADMIN_PASSWORD_HARDCODED = "adminpass"; // Matches backend hardcoded password
+import { useNavigate } from 'react-router-dom'
+import './HomePage.css'
 
 function HomePage() {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [studentRollNumber, setStudentRollNumber] = useState(null);
-  const [error, setError] = useState(null);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [showStudentLogin, setShowStudentLogin] = useState(false);
+  const [studentRoll, setStudentRoll] = useState('')
+  const [adminPassword, setAdminPassword] = useState('')
+  const navigate = useNavigate()
 
-  const handleAdminLogin = async (username, password) => {
-    setError(null);
-    try {
-      // For a real app, this would be a proper authentication check.
-      // For now, we are using hardcoded values as per the backend spec.
-      if (username === "admin" && password === ADMIN_PASSWORD_HARDCODED) {
-        const response = await loginAdmin(username, password);
-        if (response.access_token) {
-          setIsAdminLoggedIn(true);
-          setShowAdminLogin(false);
-        } else {
-          setError("Invalid admin credentials.");
-        }
-      } else {
-        setError("Invalid admin credentials.");
-      }
-    } catch (err) {
-      setError(err.message || "Admin login failed.");
+  const handleStudentLogin = (e) => {
+    e.preventDefault()
+    if (studentRoll.trim()) {
+      navigate(`/student/${studentRoll.trim()}`)
     }
-  };
+  }
 
-  const handleStudentLogin = (rollNumber) => {
-    // In a real application, you'd validate the roll number against the DB
-    // For this prototype, we'll just set the roll number.
-    setStudentRollNumber(rollNumber);
-    setShowStudentLogin(false);
-  };
-
-  const handleLogout = () => {
-    setIsAdminLoggedIn(false);
-    setStudentRollNumber(null);
-    setError(null);
-    setShowAdminLogin(false);
-    setShowStudentLogin(false);
-  };
+  const handleAdminLogin = (e) => {
+    e.preventDefault()
+    // Simple password check - in production, use proper authentication
+    if (adminPassword === 'admin123') {
+      navigate('/admin')
+    } else {
+      alert('Invalid admin password')
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        {!isAdminLoggedIn && !studentRollNumber && (
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome to Face Attendance</h1>
-            <div className="space-x-4">
-              <button
-                onClick={() => { setShowAdminLogin(true); setShowStudentLogin(false); setError(null); }}
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
+    <div className="home-page">
+      <div className="home-container">
+        <div className="home-header">
+          <h1>🎓 Face Recognition Attendance System</h1>
+          <p>Real-time attendance tracking with AI-powered face recognition</p>
+        </div>
+
+        <div className="login-cards">
+          <div className="card login-card">
+            <h2>Student Portal</h2>
+            <p>View your attendance and statistics</p>
+            <form onSubmit={handleStudentLogin}>
+              <div className="form-group">
+                <label>Roll Number</label>
+                <input
+                  type="text"
+                  placeholder="Enter your roll number"
+                  value={studentRoll}
+                  onChange={(e) => setStudentRoll(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary btn-block">
+                Student Login
+              </button>
+            </form>
+          </div>
+
+          <div className="card login-card">
+            <h2>Admin Portal</h2>
+            <p>Manage students, cameras, and attendance</p>
+            <form onSubmit={handleAdminLogin}>
+              <div className="form-group">
+                <label>Admin Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter admin password (admin123)"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-success btn-block">
                 Admin Login
               </button>
-              <button
-                onClick={() => { setShowStudentLogin(true); setShowAdminLogin(false); setError(null); }}
-                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              >
-                Student Portal
-              </button>
-            </div>
-            {error && <p className="text-red-500 mt-4">{error}</p>}
+            </form>
           </div>
-        )}
+        </div>
 
-        {showAdminLogin && (
-          <Login role="admin" onLogin={handleAdminLogin} onCancel={handleLogout} />
-        )}
-
-        {showStudentLogin && (
-          <Login role="student" onLogin={handleStudentLogin} onCancel={handleLogout} />
-        )}
-
-        {isAdminLoggedIn && (
-          <AdminDashboard onLogout={handleLogout} />
-        )}
-
-        {studentRollNumber && (
-          <StudentDashboard rollNumber={studentRollNumber} onLogout={handleLogout} />
-        )}
+        <div className="features">
+          <div className="feature-card">
+            <div className="feature-icon">📹</div>
+            <h3>Live Monitoring</h3>
+            <p>Real-time face detection and recognition with GPU acceleration</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">📊</div>
+            <h3>Attendance Tracking</h3>
+            <p>Automated attendance marking with confidence scores</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎯</div>
+            <h3>High Accuracy</h3>
+            <p>InsightFace-powered recognition with 99%+ accuracy</p>
+          </div>
+        </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default HomePage;
+export default HomePage

@@ -1,23 +1,19 @@
-import { useState } from 'react'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './pages/HomePage'
+import AdminDashboard from './components/AdminDashboard'
+import StudentDashboard from './components/StudentDashboard'
 import './index.css'
 
 function App() {
-
   return (
     <Router>
-      <nav className="p-4 bg-gray-800 text-white flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">Face Attendance System</Link>
-        <div>
-          {/* You can add navigation links here for different sections if needed */}
-        </div>
-      </nav>
-
-      <div className="container mx-auto p-4">
+      <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/* Add other routes here as you create more pages/components */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/student/:rollNumber" element={<StudentDashboard />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>
